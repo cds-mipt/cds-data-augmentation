@@ -134,7 +134,7 @@ def augment_please(image, polygons_of_image, image_name):
     global image_id_global
     
     num_of_augmentations = args.num_output_images_from_one_image
-    sometimes = lambda aug: iaa.Sometimes(0.5, aug) # С вероятностью 0.5 будет делать перспективную трансформацию, см. ниже Perspectiv
+    sometimes = lambda aug: iaa.Sometimes(args.scale_probability, aug)
     full_list = list()
     num = 0
     for i in range(num_of_augmentations):
@@ -154,11 +154,11 @@ def augment_please(image, polygons_of_image, image_name):
                 width_of_new_image = int(args.min_width*k)
                 height_of_new_image = int(args.min_height*k)
         aug = iaa.Sequential([
-            iaa.Affine(rotate=(-10, 10)),
+            iaa.Affine(rotate=(-args.angle, args.angle)),
             iaa.CropToFixedSize(width=width_of_new_image, height=height_of_new_image),
             iaa.Fliplr(args.flip_horizontal_probab),
             iaa.Flipud(args.flip_vertical_probab),
-            sometimes(iaa.PerspectiveTransform(scale=(0.01, 0.10)))
+            sometimes(iaa.PerspectiveTransform(scale=args.scale_tuple))
         ])
         aug = aug.to_deterministic()
         batch_aug = aug.augment(
@@ -305,6 +305,28 @@ def build_parser():
         type=int,
         help='Number of augmentated images made from one image (default=18)'
     )
+    
+        parser.add_argument(
+        "--angle",
+        default=10.0,
+        type=float,
+        help='Angle of random rotation. The rotation will be from -angle to +angle (default=10)'
+    )
+        
+        parser.add_argument(
+        "--scale_probability",
+        default=0.5,
+        type=float,
+        help='Probablity of scaling (“zoom” in/out) (default=0.5)'
+    )    
+    
+        parser.add_argument(
+        "--scale_tuple",
+        default=(0.01, 0.10),
+        type=tuple,
+        help='Scaling (“zoom” in/out). Scaling factor to use, where 1.0 denotes “no change” and 0.5 is zoomed out to 50 percent of the original size. A scaling factor value will be uniformly sampled per image from [a, b] (default=(0.01, 0.10))'
+    )
+    
     
     return parser
 
