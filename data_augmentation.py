@@ -288,7 +288,7 @@ def build_parser():
         "--preserve-ratio-of-sides",
         default=True,
         type=str2bool,
-        help='True/False. If output images should preserve ratio of the input image'
+        help='True/False. If output images should preserve ratio of the (min-width x min-height)'
     )    
     
     parser.add_argument(
@@ -303,7 +303,7 @@ def build_parser():
         "--num-output-images-from-one-image",
         default=18,
         type=int,
-        help='Number of augmentated images made from one image (default=16)'
+        help='Number of augmentated images made from one image (default=18)'
     )
     
     return parser
